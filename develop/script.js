@@ -2,9 +2,11 @@
 var workHours = [9, 10, 11, 12, 13, 14, 15, 16, 17];
 var dayEvents = ["", "", "", "", "", "", "", "", ""];
 
+// initialize page
 init();
 
 function init() {
+    // append current date to page
     var currDay = moment().format("dddd, MMMM Do");
     $("#currentDay").text(currDay);
 
@@ -13,6 +15,44 @@ function init() {
     getEvents();
 }
 
+// create time blocks using HTML elements and append to .container div
+function makeTimeBlocks() {
+    for (i = 0; i < workHours.length; i++) {
+        
+        // create time block row
+        var timeBlockEl = $("<div>");
+        timeBlockEl.addClass("row");
+        timeBlockEl.addClass("time-block");
+
+        // create hour label
+        var hourEl = $("<label>");
+        hourEl.addClass("hour");
+        hourEl.text(moment(workHours[i], "H").format("hA"));
+
+        // create event textarea
+        var textEl = $("<textarea>");
+
+        // create save button with save icon
+        var buttonEl = $("<button>");
+        buttonEl.addClass("saveBtn");
+        buttonEl.attr("hour", workHours[i]);
+        var imageEl = $("<img>")
+        imageEl.attr("src", "./assets/images/save-icon.png");
+        imageEl.attr("alt", "save icon");
+        buttonEl.append(imageEl);
+
+        // append hour, event, and save button to time block row
+        timeBlockEl.append(hourEl);
+        timeBlockEl.append(textEl);
+        timeBlockEl.append(buttonEl);
+
+        // append time block row to container div
+        $(".container").append(timeBlockEl);
+
+    }
+}
+
+// retreive events array from local storage and append to page
 function getEvents() {
     var storageEvents = JSON.parse(localStorage.getItem("events"));
     if (storageEvents) {
@@ -24,45 +64,9 @@ function getEvents() {
     }
 }
 
-function makeTimeBlocks() {
-    for (i = 0; i < workHours.length; i++) {
-        
-        var timeBlockEl = $("<div>");
-        timeBlockEl.addClass("row");
-        timeBlockEl.addClass("time-block");
-
-        var hourEl = $("<label>");
-        var hourText;
-        if (workHours[i] > 12) {
-            hourText = workHours[i] - 12;
-        } else {
-            hourText = workHours[i];
-        }
-        if (workHours[i] >= 12) {
-            hourText += "PM";
-        } else {
-            hourText += "AM";
-        }
-        hourEl.addClass("hour");
-        hourEl.text(hourText);
-
-        var textEl = $("<textarea>");
-        textEl.addClass("description");
-
-        var buttonEl = $("<button>");
-        buttonEl.addClass("saveBtn");
-        buttonEl.attr("hour", workHours[i]);
-
-        timeBlockEl.append(hourEl);
-        timeBlockEl.append(textEl);
-        timeBlockEl.append(buttonEl);
-
-        $(".container").append(timeBlockEl);
-
-    }
-}
-
+// set past, present, or future classes on time blocks
 function setPastFuture() {
+    // retreive current hour
     var currHour = moment().format("H");
     var timeBlocks = $(".container").children();
 
@@ -77,15 +81,9 @@ function setPastFuture() {
     }
 }
 
+// save event typed in textarea to local storage
 $(".saveBtn").on("click", function(event) {
-    var index = $(this).attr('hour') - 9;
+    var index = $(this).attr('hour') - workHours.length;
     dayEvents[index] = $(this).parent().children().eq(1).val();
     localStorage.setItem("events", JSON.stringify(dayEvents));
 });
-
-
-// /* <div class="row time-block">
-//         <label class="hour">9AM</label>
-//         <textarea class="description"></textarea>
-//         <button class="saveBtn"></button>
-// </div> */
