@@ -1,5 +1,6 @@
 // declare & initialize global variables
 var workHours = [9, 10, 11, 12, 13, 14, 15, 16, 17];
+var dayEvents = ["", "", "", "", "", "", "", "", ""];
 
 init();
 
@@ -9,6 +10,18 @@ function init() {
 
     makeTimeBlocks();
     setPastFuture();
+    getEvents();
+}
+
+function getEvents() {
+    var storageEvents = JSON.parse(localStorage.getItem("events"));
+    if (storageEvents) {
+        dayEvents = storageEvents;
+    }
+    var timeBlocks = $(".container").children();
+    for (i = 0; i < dayEvents.length; i++) {
+        timeBlocks.eq(i).children().eq(1).val(dayEvents[i]);
+    }
 }
 
 function makeTimeBlocks() {
@@ -64,18 +77,11 @@ function setPastFuture() {
     }
 }
 
-
-
-
-// $(".saveBtn").on("click", function(event) {
-//     console.log(event.target);
-
-// use hour attr - 9 for indexing
-// })
-
-
-
-
+$(".saveBtn").on("click", function(event) {
+    var index = $(this).attr('hour') - 9;
+    dayEvents[index] = $(this).parent().children().eq(1).val();
+    localStorage.setItem("events", JSON.stringify(dayEvents));
+});
 
 
 // /* <div class="row time-block">
